@@ -53,10 +53,11 @@ namespace XdTwitchBot
 			client = new TwitchClient(customClient);
 			client.Initialize(credentials, TwitchInfo.ChannelName);
 
+			client.OnConnected += Client_OnConnected;
 			client.OnLog += Client_OnLog;
 			client.OnConnectionError += Client_OnConnectionError;
 			client.OnMessageReceived += Client_OnMessageReceived;
-			client.OnConnected += Client_OnConnected;
+			client.OnWhisperReceived += Client_OnWhisperReceived;
 
 			client.Connect();
 			Console.WriteLine("Connected!");
@@ -65,6 +66,16 @@ namespace XdTwitchBot
 		private void Client_OnConnected(object sender, OnConnectedArgs e)
 		{
 			client.SendMessage(TwitchInfo.ChannelName, "HeyGuys");
+
+			//foreach (var channel in client.JoinedChannels)//reserved in case joining many channels is implemented
+			//{
+			//	client.SendMessage(channel, "HeyGuys");
+			//}
+		}
+
+		private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
+		{
+			Console.WriteLine($"Received a whisper! Message: {e.WhisperMessage.Message}");
 		}
 
 		private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -100,10 +111,10 @@ namespace XdTwitchBot
 			client.SendWhisper(username, Message1);
 			client.SendWhisper(username, Message2);
 
-			AlreadySent.Add(username, 1);//add a new user with a base count of one Xd
+			AlreadySent.Add(username, 1);//add a new user with a base count of one "Xd"
 
 			MessageCount++;
-			if (MessageCount > 4)//wait after sending too many messages - to be improved (maybe?)
+			if (MessageCount > 5)//wait after sending too many messages - to be improved (maybe?)
 			{
 				Thread.Sleep(45000);
 				MessageCount = 0;
@@ -116,15 +127,18 @@ namespace XdTwitchBot
 			client.Disconnect();
 			Console.WriteLine("Disconnected!");
 
-			//output the log
-			var path = String.Format("XdLogs{0}.txt", DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss"));
-
-			using (var writer = new StreamWriter(path))
+			if (AlreadySent.Count > 0)
 			{
-				writer.WriteLine("Username: Amount of Xd's during the session");
-				foreach (var pair in AlreadySent)
+				//output the log
+				var path = String.Format("XdLogs{0}.txt", DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss"));
+
+				using (var writer = new StreamWriter(path))
 				{
-					writer.WriteLine($"{pair.Key}: {pair.Value}");
+					writer.WriteLine("Username: Amount of Xd's during the session");
+					foreach (var pair in AlreadySent)
+					{
+						writer.WriteLine($"{pair.Key}: {pair.Value}");
+					}
 				}
 			}
 		}
