@@ -61,7 +61,7 @@ namespace XdTwitchBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ... .
+        ///   Looks up a localized string similar to 7bgizxh48mzfsa8a0rmj4miudu1spy.
         /// </summary>
         internal static string BotToken {
             get {
@@ -70,7 +70,7 @@ namespace XdTwitchBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ... .
+        ///   Looks up a localized string similar to ForbiddenXdBot.
         /// </summary>
         internal static string BotUsername {
             get {
@@ -79,7 +79,7 @@ namespace XdTwitchBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ... .
+        ///   Looks up a localized string similar to stukeleyak.
         /// </summary>
         internal static string ChannelName {
             get {
@@ -88,7 +88,7 @@ namespace XdTwitchBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ... .
+        ///   Looks up a localized string similar to bfofxsnssp39gem9yx0f7vzb5g1j0z.
         /// </summary>
         internal static string ClientId {
             get {
