@@ -118,15 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BotToken" xml:space="preserve">
-    <value>p13379e8aantgzjfkytgftv8om9zl5</value>
+    <value>BotTokenHere</value>
   </data>
   <data name="BotUsername" xml:space="preserve">
-    <value>ForbiddenXdBot</value>
+    <value>BotUsernameHere</value>
   </data>
   <data name="ChannelName" xml:space="preserve">
-    <value>stukeleyak</value>
+    <value>DesiredChannelHere</value>
   </data>
   <data name="ClientId" xml:space="preserve">
-    <value>bfofxsnssp39gem9yx0f7vzb5g1j0z</value>
+    <value>ClientIdHere</value>
   </data>
 </root>
