@@ -1,4 +1,4 @@
-﻿using TwitchLib.Communication.Models;
+using TwitchLib.Communication.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -7,6 +7,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO;
+using TwitchLib.Communication.Events;
 
 namespace XdTwitchBot
 {
@@ -27,8 +28,18 @@ namespace XdTwitchBot
 	Nie sondze. „Xd” to symptom tego, że masz mnie, jako rozmówcę, gdzieś, bo Ci się nawet kliknąć nie chce, żeby mi wysłać poprawny emotikon.Szanujesz mnie? Używaj „xd”, „xD”,
 	„XD”, do wyboru. Nie szanujesz mnie? Okaż to. Wystarczy, że wstawisz to zjebane „Xd” w choć jednej wiadomości. Nie pozdrawiam.";
 
+		//In case the person whispers back with a message that contains Xd
+		private readonly string ResponseMessage = @"...masz ty w ogóle rozum i godność człowieka? :rage:";
+
 		//Manual whisper throttler since WhisperThrottlingPeriod doesn't seem to be working
 		private int MessageCount = 0;
+
+		//Keeping track of the total whispers sent (to check if the bot isn't malfunctioning/spamming too much)
+		private int GlobalMessageCount = 0;
+
+		//Making the whisper throttle more smooth by measuring how long it took since last Xd
+		private TimeSpan TimeElapsed;
+		private DateTime CurrentDate;
 
 		/// <summary>
 		/// The dictionary is responsible for keeping track of users' usage of Xd - every time a user gets sent a whisper, one is added to value. The bot will not send
@@ -61,6 +72,7 @@ namespace XdTwitchBot
 
 			client.Connect();
 			Console.WriteLine("Connected!");
+			CurrentDate = DateTime.Now;
 		}
 
 		private void Client_OnConnected(object sender, OnConnectedArgs e)
@@ -75,7 +87,12 @@ namespace XdTwitchBot
 
 		private void Client_OnWhisperReceived(object sender, OnWhisperReceivedArgs e)
 		{
-			Console.WriteLine($"Received a whisper! Message: {e.WhisperMessage.Message}");
+			Console.WriteLine($"Received a whisper from {e.WhisperMessage.DisplayName}! Message: {e.WhisperMessage.Message}");
+
+			if (e.WhisperMessage.Message.Contains("Xd"))
+			{
+				client.SendWhisper(e.WhisperMessage.DisplayName, ResponseMessage);
+			}
 		}
 
 		private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
@@ -113,12 +130,21 @@ namespace XdTwitchBot
 
 			AlreadySent.Add(username, 1);//add a new user with a base count of one "Xd"
 
-			MessageCount++;
+			GlobalMessageCount += 2;
+			TimeElapsed = DateTime.Now - CurrentDate;
+
+			//add to the counter only if less than 10 seconds have passed since the last whisper
+			if (TimeElapsed < TimeSpan.FromMilliseconds(10000))
+			{
+				MessageCount++;
+			}
+
 			if (MessageCount > 5)//wait after sending too many messages - to be improved (maybe?)
 			{
-				Thread.Sleep(45000);
+				Thread.Sleep(30000);
 				MessageCount = 0;
 			}
+			CurrentDate = DateTime.Now;
 		}
 
 		internal void Disconnect()
@@ -134,6 +160,7 @@ namespace XdTwitchBot
 
 				using (var writer = new StreamWriter(path))
 				{
+					writer.WriteLine($"Total whispers sent: {GlobalMessageCount}");
 					writer.WriteLine("Username: Amount of Xd's during the session");
 					foreach (var pair in AlreadySent)
 					{
